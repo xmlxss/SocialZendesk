@@ -14,7 +14,7 @@ def webhook_event(id):
         'ticket': {
             'id': id,
             'priority': 'urgent',
-            'email': 'osman.kalayci@dyflexis.com',
+            'email': 'test@mail.com',
             'status': random_status(),
             'subject': 'Test ticket',
             'description': 'This is a test ticket',
