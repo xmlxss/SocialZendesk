@@ -11,3 +11,8 @@ class Config:
     INSOCIAL_TEMPLATE = 'tenant id'
     INSOCIAL_CUSTOMERID = 'tenant id'
     INSOCIAL_SURVEYID = 'survey id'
+    FROM_EMAIL = 'email'
+    FROM_COMPANY = 'company name'
+    SUBJECT = 'subject'
+    AGENT = 'agent'
+    LOCATION = 'location'

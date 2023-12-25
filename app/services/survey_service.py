@@ -7,15 +7,15 @@ from app.utils.event_utils import update_event_status
 def send_survey(event):
     payload = {
     "template": current_app.config['INSOCIAL_TEMPLATE'],
-    "fromName": "Dyflexis Support",
-    "fromEmail": "info@dyflexis.com", 
-    "subject": "Hoe heeft u Dyflexis Support ervaren?",
+    "fromName": current_app.config['FROM_COMPANY'],
+    "fromEmail": current_app.config['FROM_EMAIL'], 
+    "subject": current_app.config['SUBJECT'],
     "invites": [
         {
             "email": event.email,
             "data": {
-                "agent": "Osman Kalayci",
-                "location": "Den-Haag",
+                "agent": current_app.config['AGENT'],
+                "location": current_app.config['LOCATION'],
             }
         }
     ]
