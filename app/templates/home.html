@@ -1,46 +1,76 @@
 {% extends "base.html" %}
+
 {% block content %}
 <div class="container mt-4">
-    <h1>Connection Feed</h1>
-    <ul class="list-group" id="event-list">
-        {% for event in webhook_events %}
-        <li class="list-group-item">
-            <strong>{{ event.ticket_id }}</strong> - {{ event.event_status }} - Received at {{ event.received_at }}
-        </li>
-        {% endfor %}
-    </ul>
-    <nav aria-label="Page navigation">
-        <ul class="pagination">
-            {% for i in range(1, total // per_page + 1) %}
-            <li class="page-item"><a class="page-link" href="{{ url_for('main.home', page=i) }}">{{ i }}</a></li>
-            {% endfor %}
-        </ul>
-    </nav>
+    <div class="row">
+        <!-- Section 1: Received Webhook Events -->
+        <div class="col-md-4">
+            <div class="section">
+                <h2>Received Webhook Events</h2>
+                <ul class="list-group" id="received-events-list">
+                    {% for event in received_webhook_events %}
+                    <li class="list-group-item">
+                        <strong>Event ID:</strong> {{ event.id }} - 
+                        <strong>Status:</strong> {{ event.event_status }} - 
+                        <strong>Received At:</strong> {{ event.received_at }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 2: Sent Surveys -->
+        <div class="col-md-4">
+            <div class="section">
+                <h2>Sent Surveys</h2>
+                <ul class="list-group" id="sent-surveys-list">
+                    {% for survey in sent_surveys %}
+                    <li class="list-group-item">
+                        <strong>Survey ID:</strong> {{ survey.id }} - 
+                        <strong>Linked Event:</strong> {{ survey.webhook_event_id }} - 
+                        <strong>Sent At:</strong> {{ survey.sent_at }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 3: Live Feed -->
+        <div class="col-md-4">
+            <div class="section">
+                <h2>Live Feed</h2>
+                <ul class="list-group" id="live-feed-list">
+                    <!-- Live feed content will be populated here -->
+                </ul>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock content %}
+
 {% block script %}
 <script>
-    let lastEventId = {{ webhook_events[0].id if webhook_events|length > 0 else 'null' }};
-    
-    function addEvent(event) {
-        if (event.id <= lastEventId) {
-            return;
-        }
-
-        const eventList = document.getElementById("event-list");
-        const newItem = document.createElement("li");
-        newItem.className = "list-group-item";
-        newItem.innerHTML = `<strong>${event.ticket_id}</strong> - ${event.event_status} - Received at ${event.received_at}`;
-        eventList.appendChild(newItem);
-
-        lastEventId = event.id;
-    }
-
-    const eventSource = new EventSource("{{ url_for('main.sse_feed', last_event_id=lastEventId) }}");
+    const eventSource = new EventSource("{{ url_for('main.sse_feed') }}");
 
     eventSource.onmessage = (event) => {
         const eventData = JSON.parse(event.data);
-        addEvent(eventData);
+        console.log(eventData);
+        const eventList = document.getElementById("live-feed-list");
+        const newItem = document.createElement("li");
+        newItem.className = "list-group-item";
+        
+
+        if (eventData.type === "webhook_event") {
+            newItem.innerHTML = `<strong>Webhook Event ID:</strong> ${eventData.id} - 
+                                 <strong>Status:</strong> ${eventData.event_status} - 
+                                 <strong>Received At:</strong> ${eventData.received_at}`;
+        } else if (eventData.type === "survey") {
+            newItem.innerHTML = `<strong>Survey ID:</strong> ${eventData.id} - 
+                                 <strong>Linked Event ID:</strong> ${eventData.webhook_event_id} - 
+                                 <strong>Status:</strong> ${eventData.status}`;
+        }
+        
+        eventList.prepend(newItem);
     };
 </script>
 {% endblock script %}

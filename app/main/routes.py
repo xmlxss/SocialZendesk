@@ -4,7 +4,7 @@ from app.services.webhook_service import process_zendesk_webhook
 from app.services.sse_service import generate_sse_events
 from app.utils.auth_utils import validate_token
 from app import db, bcrypt
-from app.models import User, WebhookEvent
+from app.models import User, WebhookEvent, Survey
 from app.forms.registration_form import RegistrationForm
 from app.forms.login_form import LoginForm
 from flask_login import login_user, logout_user, current_user
@@ -14,18 +14,19 @@ def home():
     if not current_user.is_authenticated:
         flash('You need to log in to access this page', 'warning')
         return redirect(url_for('main.login'))
-    page = request.args.get('page', 1, type=int)
-    webhook_events = WebhookEvent.query.order_by(WebhookEvent.received_at.desc()).all()
-    per_page = 10
-    total = len(webhook_events)
-    webhook_events = webhook_events[(page-1)*per_page:page*per_page]
 
-    return render_template('home.html', webhook_events=webhook_events, page=page, per_page=per_page, total=total)
+    received_webhook_events = WebhookEvent.query.order_by(WebhookEvent.received_at.desc()).limit(10).all()
+    sent_surveys = Survey.query.order_by(Survey.id.desc()).limit(10).all()
+
+    return render_template('home.html', received_webhook_events=received_webhook_events, sent_surveys=sent_surveys)
+
 
 @main.route('/sse_feed')
 def sse_feed():
     last_event_id = request.args.get('last_event_id', 0, type=int)
-    return generate_sse_events(last_event_id)
+    last_survey_id = request.args.get('last_survey_id', 0, type=int) 
+    return generate_sse_events(last_event_id, last_survey_id)  
+
 
 
 
