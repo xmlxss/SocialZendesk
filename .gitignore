@@ -3,3 +3,4 @@ localconfig.py
 /venv/
 *__pycache__/
 /logs/
+.env
