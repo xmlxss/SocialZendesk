@@ -11,6 +11,7 @@
                     {% for event in received_webhook_events %}
                     <li class="list-group-item">
                         <strong>Event ID:</strong> {{ event.id }} - 
+                        <strong>Ticket ID:</strong> {{ event.ticket_id }} -
                         <strong>Status:</strong> {{ event.event_status }} - 
                         <strong>Received At:</strong> {{ event.received_at }}
                     </li>

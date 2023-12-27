@@ -68,12 +68,17 @@ def logout():
 
 @main.route('/webhook/zendesk', methods=['POST'])
 def zendesk_webhook():
+    current_app.logger.info(f'Webhook called with headers: {request.headers}')
+    current_app.logger.info(f'Webhook called with payload: {request.json}')
     if request.method != 'POST':
+        current_app.logger.warning(f'Webhook called with invalid method: {request.method}')
         return jsonify({'message': 'Method not allowed'}), 405
     if not validate_token(request.headers.get('Authorization')):
+        current_app.logger.warning(f'Webhook called with invalid token: {request.headers.get("Authorization")}')
         return jsonify({'message': 'Unauthorized'}), 401
     data = request.json.get('ticket')
     if not data:
+        current_app.logger.warning(f'Webhook called with invalid payload: {request.json}')
         return jsonify({'message': 'Invalid payload'}), 400
     return process_zendesk_webhook(data)
     
