@@ -2,7 +2,7 @@ import requests
 import random
 from time import sleep
 
-url = 'http://localhost:5000/webhook/zendesk'
+url = 'http://127.0.0.1:5000/webhook/zendesk'
 def generate_random_id():
     return random.randint(1, 1000)
 
@@ -14,7 +14,7 @@ def webhook_event(id):
         'ticket': {
             'id': id,
             'priority': 'urgent',
-            'email': 'test@mail.com',
+            'email': 'osman.kalayci@dyflexis.com',
             'status': random_status(),
             'subject': 'Test ticket',
             'description': 'This is a test ticket',
@@ -25,7 +25,11 @@ def webhook_event(id):
         "Authorization": "1234"
     }
     response = requests.post(url, headers=headers, json=data)
-    print(response.json())
+    print(response.status_code)
+    if response.ok:
+        print(response.json())
+    else:
+        print("Error: ", response.text)
 
 if __name__ == '__main__':
     while True:
